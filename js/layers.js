@@ -978,6 +978,10 @@ addLayer("s", {
                 return base + "倍禁言点获取<br>价格: " + format(this.cost()) + "禁言石<br>效果: "+format(this.effect())+"x<br>购买量上限: "+format(this.purchaseLimit())},
             canAfford() { return player.s.points.gte(this.cost())},
             buy() {
+                if(layers.b.LEffectP().gte(0.5)){
+                    setBuyableAmount(this.layer,this.id,player.s.points.max(1).log(10).sub(2).floor().min(this.purchaseLimit()))
+                    return
+                }
                 player.s.points = player.s.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -1021,6 +1025,12 @@ addLayer("s", {
             display() { return "将禁言石转化为领域石<br>价格: " + format(this.cost()) + "禁言石<br>效果: +"+format(this.effect(),0)+"<br>上限: "+format(this.purchaseLimit(),0)},
             canAfford() { return player.s.points.gte(this.cost())},
             buy() {
+                if(layers.b.LEffectP().gte(0.5)){
+                    let a = getBuyableAmount("s",12)
+                    setBuyableAmount(this.layer,this.id,player.s.points.div(5e4).max(1).log(2).floor().min(this.purchaseLimit()))
+                    player.s.rPoints = player.s.rPoints.add(getBuyableAmount("s",12).sub(a))
+                    return
+                }
                 player.s.points = player.s.points.sub(this.cost())
                 player.s.rPoints = player.s.rPoints.add(1)
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
@@ -1042,7 +1052,7 @@ addLayer("s", {
         14:{
             title: "禁言石倍增器",
             cost(x) {
-                let a = ten.pow(x.add(72))
+                let a = ten.pow(x.add(hasUpgrade("b",43)?0:72))
                 return a
             },
             display() { 
@@ -1052,6 +1062,10 @@ addLayer("s", {
                 return base + "倍禁言石获取<br>价格: " + format(this.cost()) + "禁言石<br>效果: "+format(this.effect())+"x<br>购买量上限: "+format(this.purchaseLimit())},
             canAfford() { return player.s.points.gte(this.cost())},
             buy() {
+                if(layers.b.LEffectP().gte(0.5)){
+                    setBuyableAmount(this.layer,this.id,player.s.points.max(1).log(10).add(1).floor().min(this.purchaseLimit()))
+                    return
+                }
                 player.s.points = player.s.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -1061,6 +1075,7 @@ addLayer("s", {
             },
             base(){
                 let base = two
+                if(layers.b.LEffectP().gte(0.75)) base = base.add(layers.b.LEffect(8))
                 return base
             },
             purchaseLimit(){
@@ -1118,7 +1133,7 @@ addLayer("s", {
             challengeDescription: "<h5>进入禁言石的第四领域,效果:<h6>清空大部分已解锁的禁言石领域资源,禁言石获取^0.8,禁言石领域I,II,III同时生效",
             canComplete() {return player.s.points.gte(1e21)},
             goalDescription: "1e21禁言石",
-            rewardDescription(){return hasUpgrade("b",37)?"解锁卢克特,注视之管理":"???"},
+            rewardDescription(){return hasUpgrade("b",37)?"解锁卢克特,注视之管理,同时解锁自动砌墙":"???"},
             onEnter() {
                 player.s.fillStone = player.s.rPoints = player.m.points = player.s.points = player.s.outTime = player.s.buyables[11] = player.s.buyables[12] = player.s.buyables[14] = zero;player.s.upgrades=[];
             },
@@ -1309,6 +1324,7 @@ addLayer("b", {
         if(player.s.outTime.gt(0)) mult = mult.mul(layers.s.outEffect(4))
         if(layers.b.LEffectP().gte(0.03)) mult = mult.mul(layers.b.LEffect(3))
         if(getBuyableAmount("b",12).gte(1)) mult = mult.mul(buyableEffect("b",12))
+        if(hasUpgrade("b",52)) mult = mult.mul(upgradeEffect("b",52))
         return mult
     },
     gainExp() {
@@ -1607,7 +1623,7 @@ addLayer("b", {
         },
         43: {
             title: "注视升级13",
-            description: "通关 TTATT 不要啊",
+            description: "禁言石倍增器的初始价格下调至1,解锁自动购买禁言石倍增器",
             cost: new Decimal(5e14),
             unlocked(){return true},
             style() { return {'border-radius': "0px",}},
@@ -1616,9 +1632,14 @@ addLayer("b", {
             currencyLayer:"b",
         },
         51: {
-            title: "注视升级51",
-            description: "???",
-            cost: new Decimal(1e1000),
+            title: "注视升级21",
+            description: "基于投入砌墙的禁言砖额外降低注视效果",
+            cost: new Decimal(1e36),
+            effect(){
+                let eff = player.b.walledBrick.max(1e44).log(10).sub(44).div(20).max(0).min(0.15)
+                return eff
+            },
+            effectDisplay(){return "-"+format(this.effect().mul(100))+"%"},
             unlocked(){return true},
             style() { return {'border-radius': "0px",}},
             currencyDisplayName:"注视点",
@@ -1626,9 +1647,14 @@ addLayer("b", {
             currencyLayer:"b",
         },
         52: {
-            title: "注视升级52",
-            description: "???",
-            cost: new Decimal(1e1000),
+            title: "注视升级22",
+            description: "解锁禁言环,禁言砖获取x100",
+            cost: new Decimal(1e69),
+            effect(){
+                let eff = ten.mul(10)
+                return eff
+            },
+            effectDisplay(){return "x"+format(this.effect())},
             unlocked(){return true},
             style() { return {'border-radius': "0px",}},
             currencyDisplayName:"注视点",
@@ -1636,7 +1662,7 @@ addLayer("b", {
             currencyLayer:"b",
         },
         53: {
-            title: "注视升级53",
+            title: "注视升级23",
             description: "???",
             cost: new Decimal(1e1000),
             unlocked(){return true},
@@ -1673,7 +1699,7 @@ addLayer("b", {
     challenges:{
         11: {
             name: "注视之管理的领域",
-            challengeDescription(){return "<h2>进入注视之管理的领域,效果:<h3><br>清空禁言砖,禁言砖升级页面中的前两行升级,但储存这些禁言砖和升级,退出领域后返还<br>进行一次禁言砖重置,但保留'外部禁言''外部禁言?'两升级<br>禁言点和禁言石获取基于未降低的注视效果降低,当前: ^"+format(this.inCeff(),4)+"<br>信息获取/1e8,打字速度/3<br>在领域中,进行凝聚重置会自动退出领域<br>当退出领域时,基于已有的信息,禁言点,禁言石获取注视点!<br>当前可获得 +"+format(inChallenge("b",11)?layers.b.LpointG():zero)+" 注视点<br>(起始于1000信息)<br>"},
+            challengeDescription(){return "<h2>进入注视之管理的领域,效果:<h3><br>清空禁言砖,禁言砖升级页面中的前两行升级,但储存这些禁言砖和升级,退出领域后返还<br>进行一次禁言砖重置,但保留'外部禁言''外部禁言?'两升级<br>禁言点和禁言石获取基于未降低的注视效果降低,当前: ^"+format(this.inCeff(),4)+"<br>信息获取/1e8,打字速度/3<br>在领域中,进行凝聚重置会自动退出领域<br>当退出领域时,基于已有的信息,禁言点,禁言石获取注视点!<br>当前可获得 +"+format(inChallenge("b",11)?this.pointG():zero)+" 注视点<br>(起始于1000信息,软上限于1e15注视点)<br>"},
             canComplete() {return player.points.gte(1e100000000000000000000000)},
             goalDescription: "<h3>???",
             rewardDescription(){return "<h3>???"},
@@ -1686,8 +1712,15 @@ addLayer("b", {
                 player.s.upgrades = [21,24].concat(hasUpgrade("b",41)?[43,53]:[])
                 if(hasUpgrade("b",42)) player.b.points = three
             },
+            pointG(){
+                let get = zero
+                get = player.m.points.div(1000).max(1).log(10).mul(player.points.root(2).max(1)).mul(player.s.points.max(1))
+                get = powsoftcap(get,n(1e15),three)
+                get = powsoftcap(get,n(1e30),three)
+                return get
+            },
             onExit() {
-                player.b.Lpoints = player.b.Lpoints.add(layers.b.LpointG())
+                player.b.Lpoints = player.b.Lpoints.add(this.pointG())
                 quickUpgBuyorSell("b",quickSpawnConst(2,7),false)
                 player.b.upgrades=player.b.upgrades.concat(player.b.saveUpgs);player.b.saveUpgs = []
                 player.b.points = player.b.saveP;player.b.saveP = zero
@@ -1813,7 +1846,7 @@ addLayer("b", {
             height: 236,
             req(){
                 max = 35
-                req = player.b.walledBrick.max(1).log(10).sub(3).div(max).max(0)
+                req = player.b.walledBrick.max(1).log(10).sub(3).div(max).max(0).min(1)
                 return req
             },
             fillStyle: {'background-color' : "#ce723c"},
@@ -1833,9 +1866,9 @@ addLayer("b", {
                 if(layers.b.LEffectP().lt(0.25)&&layers.b.LEffectP().gte(0.1)) text += "<br>降低注视效果 -25% 解锁第六效果"
                 if(layers.b.LEffectP().gte(0.25)) text += "<br>6.增加效果1,2,3的指数 +" + format(layers.b.LEffect(6))
                 if(layers.b.LEffectP().lt(0.5)&&layers.b.LEffectP().gte(0.25)) text += "<br>降低注视效果 -50% 解锁第七效果"
-                if(layers.b.LEffectP().gte(0.5)) text += "<br>7. " + format(layers.b.LEffect(7))
-                if(layers.b.LEffectP().lt(0.0525)&&layers.b.LEffectP().gte(0.5)) text += "<br>降低注视效果 -75% 解锁第八效果"
-                if(layers.b.LEffectP().gte(0.75)) text += "<br>8. " + format(layers.b.LEffect(8))
+                if(layers.b.LEffectP().gte(0.5)) text += "<br>7.最大化购买禁言石层的可购买,且不再消耗禁言石"
+                if(layers.b.LEffectP().lt(0.75)&&layers.b.LEffectP().gte(0.5)) text += "<br>降低注视效果 -75% 解锁第八效果"
+                if(layers.b.LEffectP().gte(0.75)) text += "<br>8.增加禁言石倍增器的基础效果 +" + format(layers.b.LEffect(8))
                 if(layers.b.LEffectP().lt(1)&&layers.b.LEffectP().gte(0.75)) text += "<br>降低注视效果 -100% 解锁第九效果"
                 if(layers.b.LEffectP().gte(1)) text += "<br>9. " + format(layers.b.LEffect(9))
                 return text
@@ -1875,15 +1908,11 @@ addLayer("b", {
             unlocked(){return !player.b.unlLA},
         },
     },
-    LpointG(){
-        let get = zero
-        get = player.m.points.div(1000).max(1).log(10).mul(player.points.root(2).max(1)).mul(player.s.points.max(1))
-        return get
-    },
     LEffectP(){
         let eff = tmp.b.bars["wall"].effect
         if(hasUpgrade("b",36)) eff = eff.add(upgradeEffect("b",36))
         if(getBuyableAmount("b",11).gte(1)) eff = eff.add(buyableEffect("b",11))
+        if(hasUpgrade("b",51)) eff = eff.add(upgradeEffect("b",51))
         eff = eff.min(100).max(0)
         return eff   
     },
@@ -1903,6 +1932,9 @@ addLayer("b", {
             else eff = zero
         }if(num==6){
             if(layers.b.LEffectP().gte(0.25)) eff = layers.b.LEffectP().mul(100).max(2).log(2).root(2).sub(1)
+            else eff = zero
+        }if(num==8){
+            if(layers.b.LEffectP().gte(0.75)) eff = layers.b.LEffectP().sub(0.75).max(0)
             else eff = zero
         }
         return eff
@@ -1952,5 +1984,56 @@ addLayer("b", {
         ["row",[["column",["main-display","prestige-button"]],"blank",                             
         ["display-text",function(){return "你有 "+format(player.s.points)+" 禁言石<br>你最多同时拥有 "+format(player.b.best,0)+" 禁言砖<br>你共有 "+format(player.b.total,0)+" 禁言砖<br>你在新的凝聚中花费了 "+formatTime(player.b.resetTime)+"<br>最佳凝聚时间为 "+formatTime(player.b.bestTime)+""}]]],
         ["microtabs","bricks"]
+    ], 
+})
+addLayer("c", {
+    name: "cycle",
+    symbol: "禁言环",
+    position: 0,
+    startData() { return {
+        unlocked: false,
+		points: zero,
+        bestTime: new Decimal(1e308),
+    }},
+    color: "#88FF88",
+    requires: new Decimal(1e50),
+    resource: "禁言环",
+    baseResource: "禁言砖",
+    baseAmount() {return player.b.points},
+    type: "normal",
+    exponent: 0,
+    gainMult() {
+        mult = one
+        return mult
+    },
+    gainExp() {
+        exp = one
+        return exp
+    },
+    row: 4,
+    doReset(resettingLayer){
+        player.c.bestTime=player.c.bestTime.min(player.c.resetTime)
+        if (layers[resettingLayer].row > layers[this.layer].row) {
+            let kept = []
+            layerDataReset(this.layer, kept)
+        }
+    },
+    hotkeys: [
+        {key: "c", description: "C: 进行衔接重置(禁言环)", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+    layerShown(){return tmp.b.bars['wall'].req.gte(1)||player.c.unlocked},
+    update(diff){
+
+    },
+    microtabs:{
+        n:{
+            
+        },
+    },
+    tabFormat: [ 
+        ["display-text", function() { return getPointsDisplay() }],
+        ["row",[["column",["main-display","prestige-button"]],"blank",                             
+        ["display-text",function(){return "你有 "+format(player.b.points)+" 禁言砖<br>你最多同时拥有 "+format(player.c.best,0)+" 禁言环<br>你共有 "+format(player.c.total,0)+" 禁言环<br>你在新的衔接中花费了 "+formatTime(player.c.resetTime)+"<br>最佳衔接时间为 "+formatTime(player.c.bestTime)+""}]]],
+        ["microtabs","???"]
     ], 
 })

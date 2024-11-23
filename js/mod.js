@@ -38,13 +38,13 @@ var colors = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.5.2",
-	name: "我...将...在这里...永远...看着你",
+	num: "0.1.6",
+	name: "衔接",
 }
 
 function changelog(){
 	return (options.ch || modInfo.languageMod==false)?`
-		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.5.2:`+VERSION.name+`<br>
+		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.6:`+VERSION.name+`<br>
 		
 		<span style="font-size: 17px;">
 			<h3><s>不,你应该自己写这个</s></h3><br><br>
@@ -129,12 +129,13 @@ function displayThingsRes(){
 	if(player.s.unlocked) text += "禁言石: " +format(player.s.points,0)+ " | "
 	if(player.b.unlocked) text += "禁言砖: " +format(player.b.points,1)+ " | "
 	if(player.b.unlLA) text += "注视点: " +format(player.b.Lpoints,2)+ " | "
+	if(player.c.unlocked) text += "禁言环: " +format(player.c.points,2)+ " | "
 	return text
 }
 
 // Determines when the game "ends"
 function isEndgame() {
-	return hasUpgrade("b",43)
+	return player.c.points.gte(1)
 }
 
 // 
