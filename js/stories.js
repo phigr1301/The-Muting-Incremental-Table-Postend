@@ -13,7 +13,7 @@ addLayer("sy", {
     type: "none",
     resource: "",
     row: 0,
-    layerShown(){return hasUpgrade("b",27)||player.b.unlLA},
+    layerShown(){return hasUpgrade("b",27)||player.b.unlLA||player.c.unlocked},
     doReset(){},
     microtabs:{
         stories:{

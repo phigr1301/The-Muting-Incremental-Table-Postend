@@ -38,13 +38,13 @@ var colors = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.6",
-	name: "衔接",
+	num: "0.1.6.1",
+	name: "禁言点上时长现,固化管理发石化;莫问何处解凝聚,衔接尽头全没啦!",
 }
 
 function changelog(){
 	return (options.ch || modInfo.languageMod==false)?`
-		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.6:`+VERSION.name+`<br>
+		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.6.1:`+VERSION.name+`<br>
 		
 		<span style="font-size: 17px;">
 			<h3><s>不,你应该自己写这个</s></h3><br><br>
@@ -97,6 +97,7 @@ function getPointGen() {
 	if(hasUpgrade("b",12)) gain = gain.mul(upgradeEffect("b",12))
 	if(hasUpgrade("b",15)) gain = gain.mul(upgradeEffect("b",15))
 	if(hasUpgrade("b",26)) gain = gain.mul(upgradeEffect("b",26))
+	if(hasUpgrade("c",11)) gain = gain.mul(upgradeEffect("c",11))
 	if(getBuyableAmount("s",11).gt(0)) gain = gain.mul(buyableEffect("s",11))
 	if(!player.m.mutingT.gt(0)&&hasUpgrade("s",21)) gain = gain.mul(upgradeEffect("s",21))
 	if(player.m.mutingT.gt(0)&&hasUpgrade("s",22)) gain = gain.mul(upgradeEffect("s",22))
@@ -135,7 +136,7 @@ function displayThingsRes(){
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.c.points.gte(1)
+	return player.c.total.gte(9)
 }
 
 // 
