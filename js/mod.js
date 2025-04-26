@@ -1,7 +1,7 @@
 let modInfo = {
 	name: "禁言增量页",
 	nameEN: "The Mute Table",// When you open the otherLanguageMod, this is the second language
-	id: "bannedspeakingtableeeeeeeeeeeeee",
+	id: "bannedspeakingtableeeeeeeeeeeeeePostend",
 	author: "Liuliu66686与禁言增量频道的成员们",
 	pointsName: "禁言点",
 	modFiles: ["layers.js", "tree.js","functions.js","autos.js","stories.js","vue.js"],
@@ -38,13 +38,13 @@ var colors = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1.6.1",
-	name: "禁言点上时长现,固化管理发石化;莫问何处解凝聚,衔接尽头全没啦!",
+	num: "0.1.7",
+	name: "",
 }
 
 function changelog(){
 	return (options.ch || modInfo.languageMod==false)?`
-		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.6.1:`+VERSION.name+`<br>
+		<br><br><br><h1>更新日志:</h1><br>(<span style='color: red'><s>不会写</s></span>)<br>v0.1.7:`+VERSION.name+` 当前Endgame: 未知<br>
 		
 		<span style="font-size: 17px;">
 			<h3><s>不,你应该自己写这个</s></h3><br><br>
@@ -136,7 +136,7 @@ function displayThingsRes(){
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.c.total.gte(9)
+	return false 
 }
 
 // 

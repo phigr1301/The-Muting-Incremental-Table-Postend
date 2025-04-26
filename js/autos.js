@@ -189,7 +189,7 @@ addLayer("at", {
                     "border-color": "white","background-color": "#0f0f0f"
                 },
                 content:[
-                    "blank",["row",[["clickable",11],["clickable",12]]],["row",[["clickable",21],["clickable",22],["clickable",23],["clickable",24],["clickable",25],["clickable",26]]],["row",[["clickable",31],["clickable",32]]]
+                    "blank", ["row", [["clickable", 11], ["clickable", 12]]], ["row", [["clickable", 21], ["clickable", 22], ["clickable", 23], ["clickable", 24], ["clickable", 25], ["clickable", 26]]], ["row", [["clickable", 31], ["clickable", 32]]],"blank", ["display-text", function () { return "快捷键：P暂停游戏，S固化重置，B凝聚重置，C衔接重置，I无限重置" }]
                 ],
                 unlocked(){return hasUpgrade("m",11)||player.s.unlocked},
             },

@@ -40,6 +40,135 @@ addLayer("2layer", {// Add a * small* to generate a slightly different layer
         ["display-text", function() { return getPointsDisplay() }]
     ],
 })
+addLayer("3layer", {// Add a * small* to generate a slightly different layer
+    name: "sideLayer2",
+    position: -1,
+    row: 5,
+    symbol() { return (options.ch || modInfo.languageMod == false) ? '↓ 平行维度 ↓' : '↓ layer 2 ↓' },
+    symbolEN() { return (options.ch || modInfo.languageMod == false) ? '↓ 平行维度 ↓' : '↓ layer 2 ↓' },
+    nodeStyle: { "font-size": "15px", "text-center": "center", "height": "30px" },
+    startData() {
+        return {
+            unlocked: true,
+            small: true,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    small: true,
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
+addLayer("PlH1", {// Add a * small* to generate a slightly different layer
+    name: "Placeholder1",
+    position: 999,
+    row: 5,
+    symbol: "暂未开放",
+    symbolEN: "暂未开放",
+    startData() {
+        return {
+            unlocked: false,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
+addLayer("PlH2", {// Add a * small* to generate a slightly different layer
+    name: "Placeholder2",
+    position: 999,
+    row: 9,
+    symbol: "暂未开放",
+    symbolEN: "暂未开放",
+    startData() {
+        return {
+            unlocked: false,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
+addLayer("PlH3", {// Add a * small* to generate a slightly different layer
+    name: "Placeholder3",
+    position: 999,
+    row: 15,
+    symbol: "暂未开放",
+    symbolEN: "暂未开放",
+    startData() {
+        return {
+            unlocked: false,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
+addLayer("4layer", {// Add a * small* to generate a slightly different layer
+    name: "sideLayer3",
+    position: -1,
+    row: 9,
+    symbol() { return (options.ch || modInfo.languageMod == false) ? '↓ 世界之树 ↓' : '↓ layer 3 ↓' },
+    symbolEN() { return (options.ch || modInfo.languageMod == false) ? '↓ 世界之树 ↓' : '↓ layer 3 ↓' },
+    nodeStyle: { "font-size": "15px", "text-center": "center", "height": "30px" },
+    startData() {
+        return {
+            unlocked: true,
+            small: true,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    small: true,
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
+addLayer("5layer", {// Add a * small* to generate a slightly different layer
+    name: "sideLayer4",
+    position: -1,
+    row: 15,
+    symbol() { return (options.ch || modInfo.languageMod == false) ? '↓ 最终之战 ↓' : '↓ layer 4 ↓' },
+    symbolEN() { return (options.ch || modInfo.languageMod == false) ? '↓ 最终之战 ↓' : '↓ layer 4 ↓' },
+    nodeStyle: { "font-size": "15px", "text-center": "center", "height": "30px" },
+    startData() {
+        return {
+            unlocked: true,
+            small: true,
+            points: new Decimal(0),// This actually does nothing, but you have to write this. (Unless you want add something in this layer. #Todo, might change that later.)
+        }
+    },
+    small: true,
+    color: "#fefefe",
+    type: "none",
+    tooltip() { return false },
+    layerShown() { return player.s.unlocked },// If any layer in the array is unlocked, it will returns true. Otherwise it will return false.
+    tabFormat: [
+        ["display-text", function () { return getPointsDisplay() }]
+    ],
+})
 addLayer("m", {
     name: "mute",
     symbol: "禁言",
@@ -1723,7 +1852,8 @@ addLayer("b", {
             WTG(){
                 let wt = this.WBG().div(10).max(1).log(10).pow(2)
                 if(hasUpgrade("b",35)) wt = wt.div(upgradeEffect("b",35))
-                if(getBuyableAmount("b",13).gte(1)) wt = wt.div(buyableEffect("b",13))
+                if (getBuyableAmount("b", 13).gte(1)) wt = wt.div(buyableEffect("b", 13))
+                if (hasUpgrade("c", 32)) wt = wt.div(2)
                 if(hasUpgrade("c",33)) wt = wt.div(5)
                 return wt
             },
@@ -1947,8 +2077,9 @@ addLayer("b", {
         let eff = tmp.b.bars["wall"].effect
         if(hasUpgrade("b",36)) eff = eff.add(upgradeEffect("b",36))
         if(getBuyableAmount("b",11).gte(1)) eff = eff.add(buyableEffect("b",11))
-        if(hasUpgrade("b",51)) eff = eff.add(upgradeEffect("b",51))
-        eff = eff.min(100).max(0)
+        if (hasUpgrade("b", 51)) eff = eff.add(upgradeEffect("b", 51))
+        if (hasUpgrade("c", 32)) eff = eff.add(0.006)
+        eff = eff.min(1).max(0)
         return eff   
     },
     LEffect(num){
@@ -2078,7 +2209,7 @@ addLayer("c", {
         },
         12: {
             title: "环形正提升II",
-            description: "基于禁言石倍增禁言石石获取,x1e25到达上限",
+            description: "基于禁言石倍增禁言石获取,x1e25到达上限",
             cost: new Decimal(0.25),
             buy(){
                 player.c.points = n(format(player.c.points,5))
@@ -2181,7 +2312,7 @@ addLayer("c", {
         },
         32: {
             title: "高速前期",
-            description: "自动'发一次信息',购买信息,禁言点升级,信息获取x3,打字冷却,禁言时间/2<br>(作者注:这个升级几乎必选)",
+            description: "自动'发一次信息',购买信息,禁言点升级,信息获取x3,打字冷却,禁言时间,砌墙冷却/2,降低注视效果额外-0.6%<br>(作者注:这个升级几乎必选)",
             cost: new Decimal(0.25),
             buy(){
                 player.c.points = n(format(player.c.points,5))
@@ -2260,6 +2391,13 @@ addLayer("c", {
             unlocked(){return player.c.unlocked},
             style() { return {'border-radius': "0px"}},
         },
+        51: {
+            title: "旋转放置？",
+            description: "解锁旋转",
+            cost: new Decimal(10),
+            unlocked() { return player.c.upgrades.length>=16 },
+            style() { return { 'border-radius': "0px", height: "120px", width: "480px" } },
+        },
     },
     update(diff){
 
@@ -2271,7 +2409,7 @@ addLayer("c", {
                     "border-color": "white","background-color": "#0f0f0f"
                 },
                 content:[
-                    "blank",["upgrades",[1,2,3,4]],["display-text", function() {if(false)return "到达 5e26 禁言石 解锁 "+quickColor("禁言砖","#ce723c")}],
+                    "blank",["upgrades",[1,2,3,4,5]],["display-text", function() {return "到达 1.798e308 禁言环 解锁 "+quickColor("无限","#e6c430")}],
                 ],
             },
         },
