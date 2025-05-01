@@ -17,15 +17,15 @@ addLayer("at", {
     clickables:{
         11:{
             title() {
-                let b = hasUpgrade("s",43)||hasUpgrade("c",32)
+                let b = hasUpgrade("s", 43) || hasUpgrade("c", 32) && !inChallenge('b', 12)
                 let a = player.at.auto.includes(this.id)&&b?"开":"关"
                 return "开关自动购买禁言层升级<br>当前:"+ a},
-            canClick(){return hasUpgrade("s",43)||hasUpgrade("c",32)},
+            canClick() { return hasUpgrade("s", 43) || hasUpgrade("c", 32) && !inChallenge('b', 12) },
             onClick() {          
                 quickConstElement(this.id,player.at.auto)
             },
             run(){
-                let a = hasUpgrade("s",43)||hasUpgrade("c",32)
+                let a = hasUpgrade("s", 43) || hasUpgrade("c", 32) && !inChallenge('b', 12)
                 if(!a||!player.at.auto.includes(this.id)) return
                 quickUpgBuy("m", quickSpawnConst(4,5))
             },
@@ -34,15 +34,15 @@ addLayer("at", {
         },
         12:{
             title() {
-                let b = hasUpgrade("s",53)||hasUpgrade("c",32)
+                let b = hasUpgrade("s",53)||hasUpgrade("c",32)&&!inChallenge('b',12)
                 let a = player.at.auto.includes(this.id)&&b?"开":"关"
                 return "开关自动'发一次消息'<br>当前:"+ a},
-            canClick(){return hasUpgrade("s",53)||hasUpgrade("c",32)},
+            canClick() { return hasUpgrade("s", 53) || hasUpgrade("c", 32) && !inChallenge('b', 12) },
             onClick() {          
                 quickConstElement(this.id,player.at.auto)
             },
             run(){
-                let a = hasUpgrade("s",53)||hasUpgrade("c",32)
+                let a = hasUpgrade("s", 53) || hasUpgrade("c", 32) && !inChallenge('b', 12)
                 if(!a||!player.at.auto.includes(this.id)) return
                 clickClickable("m",11)
             },
@@ -181,6 +181,26 @@ addLayer("at", {
             style() { return { 'background-color': player.at.auto.includes(this.id)?"#ce723c":"#FFFFFF", filter: "brightness(100%)",'border-radius': "0px",height: "120px", width: "200px"}},
             unlocked(){return hasUpgrade("c",24)},
         },
+        33: {
+            title() {
+                let b = hasUpgrade("c", 52)
+                let a = player.at.auto.includes(this.id) && b ? "开" : "关"
+                return "开关自动购买注视点可购买<br>当前:" + a
+            },
+            canClick() { return hasUpgrade("c", 52) },
+            onClick() {
+                quickConstElement(this.id, player.at.auto)
+            },
+            run() {
+                let a = hasUpgrade("c", 52)
+                if (!a || !player.at.auto.includes(this.id)) return
+                buyBuyable("b", 11)
+                buyBuyable("b", 12)
+                buyBuyable("b", 13)
+            },
+            style() { return { 'background-color': player.at.auto.includes(this.id) ? "#ce723c" : "#FFFFFF", filter: "brightness(100%)", 'border-radius': "0px", height: "120px", width: "200px" } },
+            unlocked() { return hasUpgrade("c", 52) },
+        },
     },
     microtabs:{
         autos:{
@@ -189,7 +209,7 @@ addLayer("at", {
                     "border-color": "white","background-color": "#0f0f0f"
                 },
                 content:[
-                    "blank", ["row", [["clickable", 11], ["clickable", 12]]], ["row", [["clickable", 21], ["clickable", 22], ["clickable", 23], ["clickable", 24], ["clickable", 25], ["clickable", 26]]], ["row", [["clickable", 31], ["clickable", 32]]],"blank", ["display-text", function () { return "快捷键：P暂停游戏，S固化重置，B凝聚重置，C衔接重置，I无限重置" }]
+                    "blank", ["row", [["clickable", 11], ["clickable", 12]]], ["row", [["clickable", 21], ["clickable", 22], ["clickable", 23], ["clickable", 24], ["clickable", 25], ["clickable", 26]]], ["row", [["clickable", 31], ["clickable", 32], ["clickable", 33]]],"blank", ["display-text", function () { return "快捷键：P暂停游戏，S固化重置，B凝聚重置，C衔接重置，I无限重置" }]
                 ],
                 unlocked(){return hasUpgrade("m",11)||player.s.unlocked},
             },

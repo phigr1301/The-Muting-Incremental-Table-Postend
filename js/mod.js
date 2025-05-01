@@ -105,7 +105,8 @@ function getPointGen() {
 	if(layers.b.LEffectP().gte(0.006)) gain = gain.mul(layers.b.LEffect(1))
 	
 	if(inChallenge("s",11)) gainpower = gainpower.mul(0.25)
-	if(inChallenge("b",11)) gainpower = gainpower.mul(tmp.b.challenges[11].inCeff)
+	if (inChallenge("b", 11)) gainpower = gainpower.mul(tmp.b.challenges[11].inCeff)
+	if (inChallenge("b", 12)) gainpower = gainpower.mul(0.05)
 
 	gain = gain.pow(gainpower)
 	return gain
@@ -129,7 +130,9 @@ function displayThingsRes(){
 	let text = '禁言点: '+format(player.points)+' | 信息: '+format(player.m.points,0)+ " | "
 	if(player.s.unlocked) text += "禁言石: " +format(player.s.points,0)+ " | "
 	if(player.b.unlocked) text += "禁言砖: " +format(player.b.points,1)+ " | "
-	if(player.b.unlLA) text += "注视点: " +format(player.b.Lpoints,2)+ " | "
+	if (player.b.unlLA) text += "注视点: " + format(player.b.Lpoints, 2)
+	if (player.b.unlLA2) text += "+" + format(player.b.L2points, 2)+"^2"
+	if(player.b.unlLA)text+=" | "
 	if(player.c.unlocked) text += "禁言环: " +format(player.c.points,2)+ " | "
 	return text
 }

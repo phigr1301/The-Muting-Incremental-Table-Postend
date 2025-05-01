@@ -195,7 +195,8 @@ addLayer("m", {
         if(hasUpgrade("m",34)) mult = mult.mul(upgradeEffect("m",34))
         if(hasUpgrade("m",35)) mult = mult.mul(upgradeEffect("m",35))
         if(hasUpgrade("c",32)) mult = mult.mul(3)
-        if(inChallenge("b",11)) mult = mult.div(1e8)
+        if (inChallenge("b", 11)) mult = mult.div(1e8)
+        if (inChallenge("b", 12)) mult = mult.div(3e9)
         if(hasUpgrade("b",41)) mult = mult.mul(100)
         mult = mult.mul(this.gainMultR())
         return mult
@@ -353,10 +354,11 @@ addLayer("m", {
             description: "禁言点获取x2",
             effect(){
                 let eff = two
+                if (inChallenge('b', 12) && hasUpgrade('b', 61)) eff=eff.pow(upgradeEffect('b',61))
                 return eff
             },
             effectDisplay(){return "x"+format(this.effect())},
-            cost: new Decimal(1000),
+            cost: () => (inChallenge('b', 12) && hasUpgrade('b', 61)) ?n(30):n(1000),
             unlocked(){return hasUpgrade("m",25)||player.s.unlocked},
             style() { return {'border-radius': "0px"}},
         },
@@ -415,12 +417,13 @@ addLayer("m", {
             effect(){
                 let power = two
                 if(hasUpgrade("s",42)) power = power.add(upgradeEffect("s",42))
-                if(hasUpgrade("c",43)) power = power.add(upgradeEffect("c",43))
+                if (hasUpgrade("c", 43)) power = power.add(upgradeEffect("c", 43))
+                if (inChallenge('b', 12) && hasUpgrade('b', 61)) power = power.mul(upgradeEffect("b", 61))
                 let eff = player.m.points.max(10).log(10).pow(power)
                 return eff
             },
-            effectDisplay(){return "x"+format(this.effect())},
-            cost: new Decimal(50000),
+            effectDisplay() { return "x" + format(this.effect()) },
+            cost: () => (inChallenge('b', 12) && hasUpgrade('b', 61)) ? n(500) : n(50000),
             unlocked(){return hasUpgrade("m",35)||player.s.unlocked},
             style() { return {'border-radius': "0px",height: "120px", width: "600px"}},
         },
@@ -516,7 +519,8 @@ addLayer("m", {
         if(hasUpgrade("c",32)) v = v.div(2)
         if(hasUpgrade("c",33)) v = v.div(5)
         if(player.m.mutingT.gt(0)) v = v.mul(10)
-        if(inChallenge("b",11)) v = v.mul(3)
+        if (inChallenge("b", 11)) v = v.mul(3)
+        if (inChallenge("b", 12)) v = v.mul(10)
         return v
     },
     muteTmaX(){
@@ -626,7 +630,8 @@ addLayer("s", {
         if(hasUpgrade("c",12)) mult = mult.mul(upgradeEffect("c",12))
         if(player.s.outTime.gt(0)) mult = mult.mul(layers.s.outEffect(2))            
         if(layers.b.LEffectP().gte(0.01)) mult = mult.mul(layers.b.LEffect(2)) 
-        if(getBuyableAmount("s",14).gte(1)) mult = mult.mul(buyableEffect("s",14))
+        if (getBuyableAmount("s", 14).gte(1)) mult = mult.mul(buyableEffect("s", 14))
+        if(inChallenge('b',12))mult=mult.div(1500)
         return mult
     },
     gainExp() {
@@ -635,10 +640,12 @@ addLayer("s", {
         if(inChallenge("b",11)) exp = exp.mul(tmp.b.challenges[11].inCeff)
         return exp
     },
-    resetsNothing(){return hasUpgrade("c",34)},
+    resetsNothing() { if (inChallenge('b', 12)) return false; return hasUpgrade("c",34)},
     passiveGeneration() { 
         let a = zero
-        if(hasUpgrade("b",24)) a = a.max(upgradeEffect("b",24))
+        if (hasUpgrade("b", 24)) a = a.max(upgradeEffect("b", 24))
+        if (hasUpgrade("c", 62)) a = a.max(upgradeEffect("c", 62))
+        if (inChallenge('b',12)) a = a.min(0)
         return a
     },
     row: 2,
@@ -1110,6 +1117,9 @@ addLayer("s", {
             title: "禁言点倍增器",
             cost(x) {
                 let a = ten.pow(x.add(3))
+                a = expRootSoftcap(a, n("1.7977e308"), n(0.95))
+                a = expRootSoftcap(a, n("1e2000"), n(0.8))
+                a = expRootSoftcap(a, n("e50000"), n(0.6))
                 return a
             },
             display() { 
@@ -1400,7 +1410,10 @@ addLayer("s", {
         }if(num==3){
             if(hasUpgrade("s",82)) eff = player.s.outEffBase.root(3)
         }if(num==4){
-            if(hasUpgrade("s",83)) eff = player.s.outEffBase.add(1).root(3)
+            if (hasUpgrade("s", 83)) {
+                eff = player.s.outEffBase.add(1).root(3)
+                if(hasUpgrade('c',61))eff=eff.pow(upgradeEffect('c',61))
+            }
         }
         return eff
     },
@@ -1459,9 +1472,13 @@ addLayer("b", {
         walledBrick: zero,
         R4Opened: false,
         unlLA: false,
+        unlLA2: false,
         saveP: zero,
         saveUpgs: [],
+        saveWB: zero,
         Lpoints: zero,
+        L2points: zero,
+        clearwai:zero,
     }},
     color: "#ce723c",
     requires: new Decimal(5e26),
@@ -1502,7 +1519,8 @@ addLayer("b", {
     layerShown(){return player.s.total.gt(1e20)||player.b.unlocked},
     passiveGeneration() { 
         let a = zero
-        if(hasUpgrade("c",44)) a = a.max(upgradeEffect("c",44))
+        if (hasUpgrade("c", 44)) a = a.max(upgradeEffect("c", 44))
+        if (inChallenge('b', 12)) a = a.min(0)
         return a
     },
     upgrades:{
@@ -1834,6 +1852,78 @@ addLayer("b", {
             currencyInternalName:"Lpoints",
             currencyLayer:"b",
         },
+        61: {
+            title: "注视升级31",
+            description: "在第二层注视内，升级“强化禁言”“超强化禁言”效果^10,且更便宜",
+            cost: new Decimal(5),
+            effect() {
+                let eff = ten
+                return eff
+            },
+            effectDisplay() { return "^" + format(this.effect()) },
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "二级注视点",
+            currencyInternalName: "L2points",
+            currencyLayer: "b",
+        },
+        62: {
+            title: "注视升级32",
+            description: "基于二级注视点增益禁言环(购买需要进入第二层注视)",
+            cost: new Decimal(3),
+            effect() {
+                let eff = player.b.L2points.max(1)
+                eff=logsoftcap(eff,two,two)
+                return eff
+            },
+            effectDisplay() { return "x" + format(this.effect()) },
+            canAfford() { return player.s.points.gte(this.cost)&&inChallenge('b',12) },
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "禁言石",
+            currencyInternalName: "points",
+            currencyLayer: "s",
+        },
+        63: {
+            title: "注视升级33",
+            description: "???",
+            cost: new Decimal(1e309),
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "二级注视点",
+            currencyInternalName: "L2points",
+            currencyLayer: "b",
+        },
+        71: {
+            title: "注视升级41",
+            description: "???",
+            cost: new Decimal(1e309),
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "二级注视点",
+            currencyInternalName: "L2points",
+            currencyLayer: "b",
+        },
+        72: {
+            title: "注视升级42",
+            description: "???",
+            cost: new Decimal(1e309),
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "二级注视点",
+            currencyInternalName: "L2points",
+            currencyLayer: "b",
+        },
+        73: {
+            title: "注视升级43",
+            description: "???",
+            cost: new Decimal(1e309),
+            unlocked() { return player.b.unlLA2 },
+            style() { return { 'border-radius': "0px", } },
+            currencyDisplayName: "二级注视点",
+            currencyInternalName: "L2points",
+            currencyLayer: "b",
+        },
     },
     clickables:{
         11:{
@@ -1896,6 +1986,39 @@ addLayer("b", {
             },
             style() {return {filter: "brightness(100%)",'border-radius': "0px",height: "592px", width: "352px"}},
             unlocked(){return player.b.unlLA},
+        },
+        12: {
+            name: "注视之管理的领域 II (test)",
+            challengeDescription() { return "<h2>进入第二层注视领域,效果:<h3><br>清空禁言砖,禁言砖升级页面中的所有升级,投入砌墙的禁言砖,但储存这些禁言砖和升级,退出领域后返还<br>进行一次禁言砖重置,但保留'外部禁言''外部禁言?'两升级<br>降低的注视效果/5,信息获取/3e9,打字速度/10,禁言点获取^0.05,禁言石/1500,你无法自动获取禁言石、禁言砖,禁用禁言环升级32的qol,禁言环升级34失效(为防止bug,进入后0.1秒清空禁言砖以下所有资源)<br>在领域中,进行凝聚重置会自动退出领域<br>当退出领域时,基于已有的信息,禁言点,总禁言石获取二级注视点!<br>当前可获得 +" + format(inChallenge("b", 12) ? this.pointG() : zero) + " 二级注视点<br>(起始于1000信息,软上限于1e15注视点)<br>tip:不要在进行一层领域时进入另一层领域,可能有bug<br>" },
+            canComplete() { return player.points.gte(1e100000000000000000000000) },
+            goalDescription: "<h3>???",
+            rewardDescription() { return "<h3>???" },
+            onEnter() {
+                const upg = quickSpawnConst(3, 7)
+                for (u in upg) {
+                    if (hasUpgrade("b", upg[u])) player.b.saveUpgs.push(upg[u])
+                }
+                quickUpgBuyorSell("b", upg, false); player.b.saveP = player.b.points; player.b.points = zero; player.b.saveWB = player.b.walledBrick; player.b.walledBrick = zero
+                player.s.upgrades = [21, 24]
+                player.b.clearwai=n(0.1)
+            },
+            pointG() {
+                let get = zero
+                get = player.m.points.div(1000).max(1).log(10).mul(player.points.div(1000).root(2).max(1)).mul(player.s.total.div(5).max(1))
+                get = powsoftcap(get, n(1e15), three)
+                get = powsoftcap(get, n(1e30), three)
+                if(player.b.clearwai.gt(0))get=zero
+                return get
+            },
+            onExit() {
+                player.b.L2points = player.b.L2points.add(this.pointG())
+                quickUpgBuyorSell("b", quickSpawnConst(3, 7), false)
+                player.b.upgrades = player.b.upgrades.concat(player.b.saveUpgs); player.b.saveUpgs = []
+                player.b.points = player.b.saveP; player.b.saveP = zero
+                player.b.walledBrick = player.b.saveWB; player.b.saveWB = zero
+            },
+            style() { return { filter: "brightness(100%)", 'border-radius': "0px", height: "592px", width: "352px" } },
+            unlocked() { return player.b.unlLA2 },
         },
     },
     buyables:{
@@ -2035,7 +2158,7 @@ addLayer("b", {
                 if(layers.b.LEffectP().lt(0.75)&&layers.b.LEffectP().gte(0.5)) text += "<br>降低注视效果 -75% 解锁第八效果"
                 if(layers.b.LEffectP().gte(0.75)) text += "<br>8.增加禁言石倍增器的基础效果 +" + format(layers.b.LEffect(8))
                 if(layers.b.LEffectP().lt(1)&&layers.b.LEffectP().gte(0.75)) text += "<br>降低注视效果 -100% 解锁第九效果"
-                if(layers.b.LEffectP().gte(1)) text += "<br>9. " + format(layers.b.LEffect(9))
+                if(layers.b.LEffectP().gte(1)) text += "<br>9.解锁第二层注视领域"
                 return text
             },
             borderStyle: {'border-radius': "0px",},
@@ -2079,6 +2202,8 @@ addLayer("b", {
         if(getBuyableAmount("b",11).gte(1)) eff = eff.add(buyableEffect("b",11))
         if (hasUpgrade("b", 51)) eff = eff.add(upgradeEffect("b", 51))
         if (hasUpgrade("c", 32)) eff = eff.add(0.006)
+        if (hasUpgrade("c", 71)) eff = eff.add(upgradeEffect("c", 71))
+        if(inChallenge('b',12))eff=eff.div(5)
         eff = eff.min(1).max(0)
         return eff   
     },
@@ -2109,7 +2234,30 @@ addLayer("b", {
         player.b.waiTime = player.b.waiTime.sub(diff).max(0)
         if(player.b.waiTime.eq(0)) player.b.waiTimeMax = zero
         if(tmp.s.bars["u9x"].req.gte(1)) player.b.R4Opened = true
-        if(tmp.b.bars["unlL"].req.gte(1)) player.b.unlLA = true
+        if (tmp.b.bars["unlL"].req.gte(1)) player.b.unlLA = true
+        if (layers.b.LEffectP().gte(1)) player.b.unlLA2 = true
+        if (hasUpgrade('c', 51)&&player.b.unlLA) {
+            let get = zero
+            get = player.m.points.div(1e12).max(1).log(10).mul(player.points.root(2).max(1)).mul(player.s.points.max(1)).pow(layers.b.LEffectP())
+            get = powsoftcap(get, n(1e15), three)
+            get = powsoftcap(get, n(1e30), three)
+            player.b.Lpoints=player.b.Lpoints.add(get.div(10).mul(diff))
+        }
+        if (player.b.clearwai.gt(0)) {
+            player.b.clearwai = player.b.clearwai.sub(diff).max(0)
+            if (player.b.clearwai.lte(0)) {
+                layerDataReset('m', [])
+                layerDataReset('s', [])
+                player.points = zero
+                player.m.points = zero
+                player.s.points = zero
+                player.s.upgrades = [21, 24]
+                player.s.challenges[11] = 1
+                player.s.challenges[12] = 1
+                player.s.challenges[13] = 1
+                player.s.challenges[14] = 1
+            }
+        }
     },
     microtabs:{
         bricks:{
@@ -2138,8 +2286,8 @@ addLayer("b", {
                 },
                 content:[
                     "blank",["bar","unlL"],["display-text",function(){
-                        return "你有 <h2 style='text-shadow:0px 0px 10px;'>" +quickColor(format(player.b.Lpoints),"#AAAAAA") +"</h2> 注视点"
-                    }],"blank",["row",[["challenge",11],["column",[["buyable",11],["buyable",12],["buyable",13],["row",[["upgrade",41],["upgrade",42],["upgrade",43]]],["row",[["upgrade",51],["upgrade",52],["upgrade",53]]]]]]]
+                        return "你有 <h2 style='text-shadow:0px 0px 10px;'>" + quickColor(format(player.b.Lpoints), "#AAAAAA") + "</h2> 注视点" + (player.b.unlLA2 ? (", <h2 style='text-shadow:0px 0px 10px;'>" + quickColor(format(player.b.L2points), "#ee2222") + "</h2> 二级注视点"):"")
+                    }], "blank", ["row", [["challenge", 11], ["column", [["buyable", 11], ["buyable", 12], ["buyable", 13], ["row", [["upgrade", 41], ["upgrade", 42], ["upgrade", 43]]], ["row", [["upgrade", 51], ["upgrade", 52], ["upgrade", 53]]]]]]], ["row", [["challenge", 12], ["column", [ ["row", [["upgrade", 61], ["upgrade", 62], ["upgrade", 63]]], ["row", [["upgrade", 71], ["upgrade", 72], ["upgrade", 73]]]]]]]
                 ],
                 unlocked(){return hasChallenge("s",14)||player.c.unlocked},
             },
@@ -2170,6 +2318,7 @@ addLayer("c", {
     exponent: 1/55,
     gainMult() {
         mult = one
+        if(hasUpgrade('b',62))mult=mult.mul(upgradeEffect('b',62))
         return mult
     },
     gainExp() {
@@ -2312,7 +2461,7 @@ addLayer("c", {
         },
         32: {
             title: "高速前期",
-            description: "自动'发一次信息',购买信息,禁言点升级,信息获取x3,打字冷却,禁言时间,砌墙冷却/2,降低注视效果额外-0.6%<br>(作者注:这个升级几乎必选)",
+            description: "自动'发一次信息',购买信息,禁言点升级,信息获取x3,打字冷却,禁言时间,砌墙冷却/2,降低注视效果额外-0.6%(推荐先买这个)",
             cost: new Decimal(0.25),
             buy(){
                 player.c.points = n(format(player.c.points,5))
@@ -2392,10 +2541,64 @@ addLayer("c", {
             style() { return {'border-radius': "0px"}},
         },
         51: {
-            title: "旋转放置？",
-            description: "解锁旋转",
-            cost: new Decimal(10),
+            title: "注视自动化",
+            description: "在注视外基于信息、禁言点、禁言石、降低的注视效果，每秒获取10%的注视点(实际需3.5个禁言环)",
+            cost: new Decimal(3.5),
+            buy() {
+                player.c.points = n(format(player.c.points, 5))
+            },
             unlocked() { return player.c.upgrades.length>=16 },
+            style() { return { 'border-radius': "0px", height: "120px", width: "240px" } },
+        },
+        52: {
+            title: "自动砖购买II",
+            description: "自动购买注视点可购买(实际需3.5个禁言环)",
+            cost: new Decimal(3.5),
+            buy() {
+                player.c.points = n(format(player.c.points, 5))
+            },
+            unlocked() { return player.c.upgrades.length >= 16 },
+            style() { return { 'border-radius': "0px", height: "120px", width: "240px" } },
+        },
+        61: {
+            title: "不再无用",
+            description: "基于注视点的数量级指数增强第四个释放效果，^30达到上限",
+            cost: new Decimal(20),
+            effect() {
+                let eff = player.b.Lpoints.max(1).log(10).sub(59).div(10).max(1)
+                eff = powsoftcap(eff, four, two)
+                eff = powsoftcap(eff, eight, four)
+                eff = logsoftcap2(eff, n(12), two)
+                eff=eff.min(30)
+                return eff
+            },
+            effectDisplay() { return "^" + format(this.effect()) },
+            unlocked() { return player.c.upgrades.length >= 18 },
+            style() { return { 'border-radius': "0px", height: "120px", width: "240px" } },
+        },
+        62: {
+            title: "环形自动固化",
+            description: "每秒自动获取固化时能获取的100%禁言石",
+            cost: new Decimal(20),
+            effect() {
+                let eff = one
+                return eff
+            },
+            effectDisplay() { return "+" + format(this.effect().mul(100), 0) + "/%" },
+            unlocked() { return player.c.upgrades.length >= 18 },
+            style() { return { 'border-radius': "0px", height: "120px", width: "240px" } },
+        },
+        71: {
+            title: "环形额外降低",
+            description: "基于禁言环额外降低注视效果",
+            cost: new Decimal(50),
+            effect() {
+                let eff = player.c.points.root(2).div(1e4)
+                eff=eff.min(6.67e-4)
+                return eff
+            },
+            effectDisplay() { return "-" + format(this.effect().mul(100)) + "%" },
+            unlocked() { return player.c.upgrades.length >= 20 },
             style() { return { 'border-radius': "0px", height: "120px", width: "480px" } },
         },
     },
@@ -2409,7 +2612,7 @@ addLayer("c", {
                     "border-color": "white","background-color": "#0f0f0f"
                 },
                 content:[
-                    "blank",["upgrades",[1,2,3,4,5]],["display-text", function() {return "到达 1.798e308 禁言环 解锁 "+quickColor("无限","#e6c430")}],
+                    "blank",["upgrades",[1,2,3,4,5,6,7]],["display-text", function() {return "到达 1.798e308 禁言环 解锁 "+quickColor("无限","#e6c430")}],
                 ],
             },
         },
